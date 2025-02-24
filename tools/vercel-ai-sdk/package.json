@@ -1,5 +1,5 @@
 {
-  "name": "@example/lang-chain",
+  "name": "@tools/vercel-ai-sdk",
   "version": "1.0.0",
   "description": "",
   "scripts": {
@@ -12,10 +12,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@ai-sdk/openai": "^1.1.13",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "eslint": "^9.20.0",
     "@types/node": "^22.13.0",
+    "ai": "^4.1.45",
+    "eslint": "^9.20.0",
     "typescript": "^5.3.3",
     "vitest": "^2.1.1"
   }
