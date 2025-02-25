@@ -3,5 +3,5 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"]
   },
-  "include": ["test", "vitest.config.ts"]
+  "include": ["test", "vitest.config.ts", "vitest.setup.ts"]
 }
