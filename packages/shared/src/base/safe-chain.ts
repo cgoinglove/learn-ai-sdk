@@ -1,67 +1,135 @@
-import { isPromiseLike } from "./util";
+import { isFunction, isPromiseLike } from './util'
 
-type ChainModel<Params extends any[] = any[], Result = any> = {
-  then<U>(
-    handler: (value: Awaited<Result>) => U,
-  ): ChainModel<Params, Result extends PromiseLike<any> ? Promise<U> : U>;
-  catch<U>(
-    handler: (error: any) => U,
-  ): ChainModel<
-    Params,
-    Result extends PromiseLike<any> ? Promise<U> : U | Result
-  >;
-  finally(handler: () => void): ChainModel<Params, Result>;
-  apply(...args: Params): Result;
-};
+export interface SafeChain<T> {
+  map<U>(transform: (value: Awaited<T>) => U): T extends PromiseLike<any> ? SafeChain<Promise<U>> : SafeChain<U>
+  ifOk<U>(consumer: (value: Awaited<T>) => U): U extends PromiseLike<any> ? SafeChain<Promise<T>> : SafeChain<T>
+  ifError(consumer: (error: Error) => any): SafeChain<T>
+  isOk(): T extends PromiseLike<any> ? Promise<boolean> : boolean
+  isError(): T extends PromiseLike<any> ? Promise<boolean> : boolean
+  unwrap(): T extends PromiseLike<any> ? Promise<T> : T
+}
 
-export const Chain = <Params extends any[] = any[], Result = any>(
-  executor: (...args: Params) => Result,
-): ChainModel<Params, Result> => {
-  return {
-    then<U>(handler: (value: Awaited<Result>) => U) {
-      const wrap = (...args: Params) => {
-        const result = executor(...args) as Awaited<Result>;
-        return isPromiseLike(result)
-          ? result.then((result) => handler(result as Awaited<Result>))
-          : handler(result);
-      };
-      return Chain(wrap) as ChainModel<
-        Params,
-        Result extends PromiseLike<any> ? Promise<U> : U
-      >;
-    },
-    catch<U>(handler: (error: any) => U) {
-      const wrap = (...args: Params) => {
-        try {
-          const result = executor(...args);
-          return isPromiseLike(result)
-            ? result.then((v) => v, handler)
-            : result;
-        } catch (error) {
-          return handler(error);
-        }
-      };
-      return Chain(wrap) as ChainModel<
-        Params,
-        Result extends PromiseLike<any> ? Promise<U> : U | Result
-      >;
-    },
-    finally(handler: () => void): ChainModel<Params, Result> {
-      const wrap = (...args: Params) => {
-        let result: any;
-        try {
-          result = executor(...args);
-          if (isPromiseLike(result))
-            result = Promise.resolve(result).finally(handler.bind(null));
-          return result;
-        } finally {
-          if (!isPromiseLike(result)) handler();
-        }
-      };
-      return Chain(wrap) as ChainModel<Params, Result>;
-    },
-    apply(...args: Params): Result {
-      return executor(...args);
-    },
-  };
-};
+type Result<T = any> =
+  | {
+      isError: true
+      error: Error
+      value?: undefined
+    }
+  | {
+      isError: false
+      error?: undefined
+      value: T
+    }
+
+class Model<T = undefined> implements SafeChain<T> {
+  private result: Result<Awaited<T>>
+  private promise?: PromiseLike<void>
+
+  constructor() {
+    this.result = {
+      isError: false,
+      value: undefined as Awaited<T>,
+    }
+  }
+
+  protected ok(value: Awaited<T>) {
+    this.result = {
+      isError: false,
+      value,
+    }
+  }
+
+  private error(error: Error) {
+    this.result = {
+      isError: true,
+      error,
+    }
+  }
+
+  private next<U>(cb: (r: Result<Awaited<T>>) => U): T extends PromiseLike<any> ? Model<Promise<U>> : Model<U> {
+    const instance = new Model<unknown>()
+    if (this.promise)
+      instance.promise = this.promise
+        .then(() => cb(this.result))
+        .then(instance.ok.bind(instance), instance.error.bind(instance))
+    else {
+      try {
+        const next = cb(this.result)
+        if (isPromiseLike(next)) instance.promise = next.then(instance.ok.bind(instance), instance.error.bind(instance))
+        else instance.ok(next)
+      } catch (err) {
+        instance.error(err as Error)
+      }
+    }
+    return instance as T extends PromiseLike<any> ? Model<Promise<U>> : Model<U>
+  }
+
+  map<U>(transform: (value: Awaited<T>) => U): T extends PromiseLike<any> ? Model<Promise<U>> : Model<U> {
+    return this.next(result => {
+      if (result.isError) throw result.error
+      return transform(result.value)
+    })
+  }
+
+  ifOk<U>(consumer: (value: Awaited<T>) => U): U extends PromiseLike<any> ? Model<Promise<T>> : Model<T> {
+    return this.next(result => {
+      if (result.isError) throw result.error
+      const v = consumer(result.value)
+      if (isPromiseLike(v)) return v.then(() => result.value)
+      return result.value
+    }) as U extends PromiseLike<any> ? Model<Promise<T>> : Model<T>
+  }
+  ifError(consumer: (error: Error) => any): Model<T> {
+    return this.next(result => {
+      if (result.isError) {
+        consumer(result.error)
+        throw result.error
+      }
+      return result.value
+    }) as Model<T>
+  }
+  isOk(): T extends PromiseLike<any> ? Promise<boolean> : boolean {
+    if (this.promise)
+      return (async () => {
+        await this.promise
+        return !this.result.isError
+      })() as T extends PromiseLike<any> ? Promise<boolean> : boolean
+
+    return !this.result.isError as T extends PromiseLike<any> ? Promise<boolean> : boolean
+  }
+  isError(): T extends PromiseLike<any> ? Promise<boolean> : boolean {
+    if (this.promise)
+      return (async () => {
+        await this.promise
+        return this.result.isError
+      })() as T extends PromiseLike<any> ? Promise<boolean> : boolean
+
+    return this.result.isError as T extends PromiseLike<any> ? Promise<boolean> : boolean
+  }
+  unwrap(): T extends PromiseLike<any> ? Promise<T> : T {
+    if (this.promise)
+      return (async () => {
+        await this.promise
+        if (this.result.isError) throw this.result.error
+        return this.result.value as T extends PromiseLike<any> ? Promise<T> : T
+      })() as T extends PromiseLike<any> ? Promise<T> : T
+
+    if (this.result.isError) throw this.result.error
+    return this.result.value as T extends PromiseLike<any> ? Promise<T> : T
+  }
+}
+
+export function safe<T>(init: () => T): SafeChain<T>
+export function safe<T>(init: T): SafeChain<T>
+export function safe(): SafeChain<unknown>
+export function safe<T>(init?: T | (() => T)): SafeChain<T> {
+  const chain = new Model()
+  try {
+    const value = isFunction(init) ? init() : init
+    return chain.map(() => value as T)
+  } catch (e) {
+    return chain.map(() => {
+      throw e
+    })
+  }
+}
