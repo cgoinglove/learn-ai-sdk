@@ -1,5 +1,5 @@
 {
-  "name": "@tools/hugging-face",
+  "name": "@sdk/hugging-face",
   "version": "1.0.0",
   "description": "",
   "scripts": {
