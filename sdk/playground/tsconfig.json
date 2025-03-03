@@ -3,5 +3,6 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM", "DOM.Iterable"]
   },
-  "include": ["test", "vitest.config.mts", "vitest.setup.ts"]
+  "include": ["*.ts"],
+  "exclude": ["node_modeuls"]
 }
