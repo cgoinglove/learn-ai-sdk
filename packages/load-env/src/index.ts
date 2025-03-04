@@ -6,8 +6,7 @@ export const load = <T extends Record<string, string> = Record<string, string>>(
   const localEnv = join(root, '.env.local');
   const modeEnv = join(root, `.env.${process.env.NODE_ENV}`);
   const defaultEnv = join(root, '.env');
-  const globalEnv = join('.env');
-  return [localEnv, modeEnv, defaultEnv, globalEnv].reduce<T>((prev, path) => {
+  return [localEnv, modeEnv, defaultEnv].reduce<T>((prev, path) => {
     const variables = !existsSync(path) ? {} : (config({ path }).parsed ?? {});
     Object.entries(variables).forEach(([key, value]) => {
       if (!Object.prototype.hasOwnProperty.call(prev, key)) Object.assign(prev, { [key]: value });
