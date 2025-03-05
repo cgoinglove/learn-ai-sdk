@@ -92,6 +92,10 @@ importers:
         version: 8.25.0(eslint@9.21.0)(typescript@5.7.3)
 
   packages/load-env:
+    dependencies:
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.4.7
     devDependencies:
       '@repo/eslint-config':
         specifier: workspace:*
@@ -102,9 +106,6 @@ importers:
       '@types/node':
         specifier: ^22.13.5
         version: 22.13.8
-      dotenv:
-        specifier: ^16.4.5
-        version: 16.4.7
       typescript:
         specifier: ^5.3.3
         version: 5.7.3
@@ -303,6 +304,10 @@ importers:
         version: 5.7.3
 
   sdk/playground:
+    dependencies:
+      '@ai-sdk/xai':
+        specifier: ^1.1.12
+        version: 1.1.12(zod@3.24.2)
     devDependencies:
       '@ai-sdk/openai':
         specifier: ^1.1.13
@@ -335,8 +340,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(zod@3.24.2)
       ts-edge:
-        specifier: ^0.0.0
-        version: 0.0.0
+        specifier: ^0.0.2
+        version: 0.0.2
       ts-safe:
         specifier: ^0.0.2
         version: 0.0.2
@@ -382,6 +387,12 @@ importers:
 
 packages:
 
+  '@ai-sdk/openai-compatible@0.1.12':
+    resolution: {integrity: sha512-2bMhAEeiRz4lbW5ixjGjbPhwyqjtujkjLVpqqtqWvvUDvtUM3cw1go9pqWFgaNKSBDaXRUfi8mkAVrn1yRuY2A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+
   '@ai-sdk/openai@1.1.15':
     resolution: {integrity: sha512-irGQx5lMrYI9gub7Sy2ZHu49D3Icf7OtfOu3X8fVKMONOyi54RTKRNjVZTewkfRNE44psTbZDO8j8qmPirOTNQ==}
     engines: {node: '>=18'}
@@ -421,6 +432,12 @@ packages:
     peerDependenciesMeta:
       zod:
         optional: true
+
+  '@ai-sdk/xai@1.1.12':
+    resolution: {integrity: sha512-e60KtMDOR7vGV7hPpsar4jY6sw6sUSI6zpCVDQEkVv6B0MUzD1s5DQnCvo6+hnqVjZJHgktIFvc5QwnpVZkXPw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -2068,6 +2085,9 @@ packages:
 
   '@types/node@18.19.78':
     resolution: {integrity: sha512-m1ilZCTwKLkk9rruBJXFeYN0Bc5SbjirwYX/Td3MqPfioYbgun3IvK/m8dQxMCnrPGZPg1kvXjp3SIekCN/ynw==}
+
+  '@types/node@18.19.79':
+    resolution: {integrity: sha512-90K8Oayimbctc5zTPHPfZloc/lGVs7f3phUAAMcTgEPtg8kKquGZDERC8K4vkBYkQQh48msiYUslYtxTWvqcAg==}
 
   '@types/node@22.13.8':
     resolution: {integrity: sha512-G3EfaZS+iOGYWLLRCEAXdWK9my08oHNZ+FHluRiggIYJPOXzhOiDgpVCUHaUvyIC5/fj7C/p637jdzC666AOKQ==}
@@ -4897,8 +4917,8 @@ packages:
     peerDependencies:
       typescript: '>=4.8.4'
 
-  ts-edge@0.0.0:
-    resolution: {integrity: sha512-urdqwfCXb7nbFgukVk+Ph+Yi9JsxVjC1V0I48gKq9UboniD9l3TbtExxm3JcRneDXBiHIKpDk3r6WE632j6QyQ==}
+  ts-edge@0.0.2:
+    resolution: {integrity: sha512-2TAT1CaOVOPKf4R0vS7+eaTEniuLHaJZ1W1el/6YVHdikj1C/+6vPpvxs5LBi3BWE3mzM0MJMGGT57fwj8n72w==}
     engines: {node: '>=14.0.0'}
 
   ts-jest@29.2.6:
@@ -5306,6 +5326,12 @@ packages:
 
 snapshots:
 
+  '@ai-sdk/openai-compatible@0.1.12(zod@3.24.2)':
+    dependencies:
+      '@ai-sdk/provider': 1.0.9
+      '@ai-sdk/provider-utils': 2.1.10(zod@3.24.2)
+      zod: 3.24.2
+
   '@ai-sdk/openai@1.1.15(zod@3.24.2)':
     dependencies:
       '@ai-sdk/provider': 1.0.9
@@ -5343,6 +5369,13 @@ snapshots:
     optionalDependencies:
       zod: 3.24.2
 
+  '@ai-sdk/xai@1.1.12(zod@3.24.2)':
+    dependencies:
+      '@ai-sdk/openai-compatible': 0.1.12(zod@3.24.2)
+      '@ai-sdk/provider': 1.0.9
+      '@ai-sdk/provider-utils': 2.1.10(zod@3.24.2)
+      zod: 3.24.2
+
   '@ampproject/remapping@2.3.0':
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
@@ -5350,7 +5383,7 @@ snapshots:
 
   '@anthropic-ai/sdk@0.27.3':
     dependencies:
-      '@types/node': 18.19.78
+      '@types/node': 18.19.79
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -5566,7 +5599,7 @@ snapshots:
 
   '@browserbasehq/sdk@2.3.0':
     dependencies:
-      '@types/node': 18.19.78
+      '@types/node': 18.19.79
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -5845,7 +5878,7 @@ snapshots:
   '@ibm-cloud/watsonx-ai@1.5.1(@langchain/core@0.3.42(openai@4.86.1(ws@8.18.1)(zod@3.24.2)))':
     dependencies:
       '@langchain/textsplitters': 0.1.0(@langchain/core@0.3.42(openai@4.86.1(ws@8.18.1)(zod@3.24.2)))
-      '@types/node': 18.19.78
+      '@types/node': 18.19.79
       extend: 3.0.2
       ibm-cloud-sdk-core: 5.1.3
     transitivePeerDependencies:
@@ -6663,6 +6696,10 @@ snapshots:
   '@types/node@10.14.22': {}
 
   '@types/node@18.19.78':
+    dependencies:
+      undici-types: 5.26.5
+
+  '@types/node@18.19.79':
     dependencies:
       undici-types: 5.26.5
 
@@ -10113,9 +10150,10 @@ snapshots:
     dependencies:
       typescript: 5.7.3
 
-  ts-edge@0.0.0:
+  ts-edge@0.0.2:
     dependencies:
       ts-safe: 0.0.2
+      zod: 3.24.2
 
   ts-jest@29.2.6(@babel/core@7.26.9)(@jest/transform@29.7.0)(@jest/types@29.6.3)(babel-jest@29.7.0(@babel/core@7.26.9))(jest@29.7.0(@types/node@22.13.8)(ts-node@10.9.2(@types/node@22.13.8)(typescript@5.7.3)))(typescript@5.7.3):
     dependencies:

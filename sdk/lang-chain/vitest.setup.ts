@@ -1,3 +1,3 @@
-import { load } from '@repo/load-env'
+import { load } from "@repo/load-env";
 
-load()
+load();

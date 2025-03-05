@@ -1,16 +1,16 @@
-import { AIMessage } from '@langchain/core/messages';
-import { RunnableConfig } from '@langchain/core/runnables';
-import { MessagesAnnotation, StateGraph } from '@langchain/langgraph';
-import { ToolNode } from '@langchain/langgraph/prebuilt';
+import { AIMessage } from "@langchain/core/messages";
+import { RunnableConfig } from "@langchain/core/runnables";
+import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
+import { ToolNode } from "@langchain/langgraph/prebuilt";
 
-import { ConfigurationSchema, ensureConfiguration } from './configuration.js';
-import { TOOLS } from './tools.js';
-import { loadChatModel } from './utils.js';
+import { ConfigurationSchema, ensureConfiguration } from "./configuration.js";
+import { TOOLS } from "./tools.js";
+import { loadChatModel } from "./utils.js";
 
 // Define the function that calls the model
 async function callModel(
   state: typeof MessagesAnnotation.State,
-  config: RunnableConfig
+  config: RunnableConfig,
 ): Promise<typeof MessagesAnnotation.Update> {
   /** Call the LLM powering our agent. **/
   const configuration = ensureConfiguration(config);
@@ -20,8 +20,11 @@ async function callModel(
 
   const response = await model.invoke([
     {
-      role: 'system',
-      content: configuration.systemPromptTemplate.replace('{system_time}', new Date().toISOString()),
+      role: "system",
+      content: configuration.systemPromptTemplate.replace(
+        "{system_time}",
+        new Date().toISOString(),
+      ),
     },
     ...state.messages,
   ]);
@@ -36,11 +39,11 @@ function routeModelOutput(state: typeof MessagesAnnotation.State): string {
   const lastMessage = messages[messages.length - 1];
   // If the LLM is invoking tools, route there.
   if ((lastMessage as AIMessage)?.tool_calls?.length || 0 > 0) {
-    return 'tools';
+    return "tools";
   }
   // Otherwise end the graph.
   else {
-    return '__end__';
+    return "__end__";
   }
 }
 
@@ -48,21 +51,21 @@ function routeModelOutput(state: typeof MessagesAnnotation.State): string {
 // https://langchain-ai.github.io/langgraphjs/concepts/low_level/#messagesannotation
 const workflow = new StateGraph(MessagesAnnotation, ConfigurationSchema)
   // Define the two nodes we will cycle between
-  .addNode('callModel', callModel)
-  .addNode('tools', new ToolNode(TOOLS))
+  .addNode("callModel", callModel)
+  .addNode("tools", new ToolNode(TOOLS))
   // Set the entrypoint as `callModel`
   // This means that this node is the first one called
-  .addEdge('__start__', 'callModel')
+  .addEdge("__start__", "callModel")
   .addConditionalEdges(
     // First, we define the edges' source node. We use `callModel`.
     // This means these are the edges taken after the `callModel` node is called.
-    'callModel',
+    "callModel",
     // Next, we pass in the function that will determine the sink node(s), which
     // will be called after the source node is called.
-    routeModelOutput
+    routeModelOutput,
   )
   // This means that after `tools` is called, `callModel` node is called next.
-  .addEdge('tools', 'callModel');
+  .addEdge("tools", "callModel");
 
 // Finally, we compile it!
 // This compiles it into a graph you can invoke and deploy.

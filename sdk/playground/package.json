@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "ts": "pnpm tsx src/selector.ts",
+    "ts": "pnpm tsx selector.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --max-warnings 0",
@@ -23,11 +23,14 @@
     "eslint": "^9.20.0",
     "inquirer": "^12.4.2",
     "ollama-ai-provider": "^1.2.0",
-    "ts-edge": "^0.0.0",
+    "ts-edge": "^0.0.2",
     "ts-safe": "^0.0.2",
     "tsx": "^4.19.3",
     "typescript": "^5.3.3",
     "vitest": "^2.1.1",
     "zod": "^3.24.2"
+  },
+  "dependencies": {
+    "@ai-sdk/xai": "^1.1.12"
   }
 }

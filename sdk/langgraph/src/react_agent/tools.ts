@@ -2,7 +2,7 @@
  * This file defines the tools available to the ReAct agent.
  * Tools are functions that the agent can use to interact with external systems or perform specific tasks.
  */
-import { TavilySearchResults } from '@langchain/community/tools/tavily_search';
+import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 
 /**
  * Tavily search tool configuration
