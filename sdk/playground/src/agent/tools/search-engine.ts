@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Tool } from '../../interfaces';
+import { Tool } from '../../../global-type';
 
 // 1. 가상 검색 엔진 도구
 export const SearchEngineSchema = z.object({

@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Tool } from '../../interfaces';
+import { Tool } from '../../../global-type';
 
 const CalculatorSchema = z.object({
   operation: z.enum(['add', 'subtract', 'multiply', 'divide']),

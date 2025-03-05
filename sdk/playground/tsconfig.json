@@ -1,8 +1,9 @@
 {
   "extends": "@repo/typescript-config/base.json",
   "compilerOptions": {
-    "lib": ["ESNext", "DOM", "DOM.Iterable"]
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    
   },
-  "include": ["src", "selector.ts", "test"],
+  "include": ["src", "selector.ts", "test", "global-type.ts"],
   "exclude": ["node_modeuls"]
 }
